@@ -22,6 +22,10 @@ class FormModel extends ChangeNotifier {
   }
 
   void save() {
+    _invoiceNumber =
+        _invoiceNumber.pure ? const InvoiceNumber.dirty() : _invoiceNumber;
+    _contractorName =
+        _contractorName.pure ? const ContractorName.dirty() : _contractorName;
     _status = Formz.validate([invoiceNumber, contractorName]);
     notifyListeners();
   }

@@ -21,12 +21,27 @@ class FormModel extends ChangeNotifier {
     _contractorName = ContractorName.dirty(value: input);
   }
 
-  void save() {
+  void saveValidate() {
     _invoiceNumber =
         _invoiceNumber.pure ? const InvoiceNumber.dirty() : _invoiceNumber;
     _contractorName =
         _contractorName.pure ? const ContractorName.dirty() : _contractorName;
     _status = Formz.validate([invoiceNumber, contractorName]);
     notifyListeners();
+  }
+
+  void sendToDb() {
+    _status = FormzStatus.submissionInProgress;
+  }
+
+  void success() {
+    _status = FormzStatus.submissionSuccess;
+    _invoiceNumber = const InvoiceNumber.pure();
+    _contractorName = const ContractorName.pure();
+    notifyListeners();
+  }
+
+  void failure() {
+    _status = FormzStatus.submissionFailure;
   }
 }

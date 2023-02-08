@@ -6,10 +6,12 @@ part 'invoice_dto.g.dart';
 class InvoiceDto {
   final String invoiceNumber;
   final String contractorName;
+  final int netWorth;
 
   InvoiceDto({
     required this.invoiceNumber,
     required this.contractorName,
+    required this.netWorth,
   });
 
   Map<String, dynamic> toJson() => _$InvoiceDtoToJson(this);

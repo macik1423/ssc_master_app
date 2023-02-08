@@ -9,10 +9,12 @@ part of 'invoice_dto.dart';
 InvoiceDto _$InvoiceDtoFromJson(Map<String, dynamic> json) => InvoiceDto(
       invoiceNumber: json['invoiceNumber'] as String,
       contractorName: json['contractorName'] as String,
+      netWorth: json['netWorth'] as int,
     );
 
 Map<String, dynamic> _$InvoiceDtoToJson(InvoiceDto instance) =>
     <String, dynamic>{
       'invoiceNumber': instance.invoiceNumber,
       'contractorName': instance.contractorName,
+      'netWorth': instance.netWorth,
     };

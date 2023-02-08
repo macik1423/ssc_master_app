@@ -3,6 +3,7 @@ import 'package:interview/add_screen/clound_db.dart';
 import 'package:interview/add_screen/db_api.dart';
 import 'package:interview/add_screen/provider/form_state.dart';
 import 'package:interview/list_screen/list.dart';
+import 'package:interview/models/provider/vat_amount_state.dart';
 
 import 'add_screen/form_screen.dart';
 import 'package:provider/provider.dart';
@@ -13,8 +14,15 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => FormModel(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<FormModel>(
+          create: (_) => FormModel(),
+        ),
+        ChangeNotifierProvider<VatAmountState>(
+          create: (_) => VatAmountState(),
+        ),
+      ],
       child: const MyApp(),
     ),
   );

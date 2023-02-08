@@ -10,4 +10,9 @@ class CloudDb implements DbApi {
   Future<void> addInvoice(InvoiceDto invoiceDto) {
     return invoice.add(invoiceDto.toJson());
   }
+
+  @override
+  Future<QuerySnapshot<Object?>> getAllInvoices() async {
+    return invoice.get();
+  }
 }

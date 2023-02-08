@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:formz/formz.dart';
 import 'package:interview/add_screen/clound_db.dart';
 import 'package:interview/add_screen/db_api.dart';
 import 'package:interview/add_screen/provider/form_state.dart';
-import 'package:interview/models/invoice_dto.dart';
+import 'package:interview/list_screen/list.dart';
 
 import 'add_screen/form_screen.dart';
 import 'package:provider/provider.dart';
@@ -48,9 +47,45 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 0;
+
+  TextStyle optionStyle =
+      const TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  late List<Widget> _widgetOptions;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _widgetOptions = <Widget>[
+      AddForm(db: widget.db),
+      ListScreen(db: widget.db),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.view_list),
+            label: 'List',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
       appBar: AppBar(
         title: Text(widget.title),
         leading: Padding(
@@ -61,107 +96,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              final formState = context.read<FormModel>();
-              formState.saveValidate();
-              _tryToSaveInDb(formState);
-            },
-            child: const Icon(
-              IconData(
-                0xe550,
-                fontFamily: 'MaterialIcons',
-              ),
-              size: 50,
-            ),
-          )
-        ],
       ),
-      body: const Center(
-        child: AddForm(),
-      ),
-    );
-  }
-
-  void _tryToSaveInDb(FormModel formState) {
-    formState.sendToDb();
-    if (formState.status.isValid) {
-      final newInvoice = InvoiceDto(
-        contractorName: formState.contractorName.value,
-        invoiceNumber: formState.invoiceNumber.value,
-      );
-      widget.db.addInvoice(newInvoice).whenComplete(
-        () {
-          successNotification();
-          formState.success();
-        },
-      ).onError(
-        (error, stackTrace) {
-          errorNotification();
-          formState.failure();
-        },
-      );
-    } else if (formState.status.isSubmissionInProgress) {
-      inProgressNotification();
-    }
-  }
-
-  ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
-      inProgressNotification() {
-    return ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: const [
-            Icon(IconData(0xe6cc, fontFamily: 'MaterialIcons'),
-                color: Colors.amber),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Dodawanie...',
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
-      errorNotification() {
-    return ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: const [
-            Icon(IconData(0xe6cc, fontFamily: 'MaterialIcons'),
-                color: Colors.redAccent),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Error',
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void successNotification() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: const [
-            Icon(IconData(0xe6cc, fontFamily: 'MaterialIcons'),
-                color: Colors.lightGreen),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Dodano',
-              ),
-            ),
-          ],
-        ),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+        // child: AddForm(),
       ),
     );
   }

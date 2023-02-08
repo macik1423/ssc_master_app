@@ -13,4 +13,7 @@ class InvoiceDto {
   });
 
   Map<String, dynamic> toJson() => _$InvoiceDtoToJson(this);
+
+  factory InvoiceDto.fromJson(Map<String, dynamic> json) =>
+      _$InvoiceDtoFromJson(json);
 }

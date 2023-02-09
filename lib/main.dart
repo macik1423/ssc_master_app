@@ -65,6 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _selectedIndex = index;
     });
+    final provider = context.read<FormModel>();
+    provider.clear();
   }
 
   @override

@@ -25,9 +25,9 @@ class _AddFormState extends State<AddForm> {
           child: Column(
             children: [
               _SaveButton(db: widget.db),
-              const _InvoiceNumberInput(),
-              const _ContractorNameInput(),
-              const _NetWorthInput(),
+              const InvoiceNumberInput(),
+              const ContractorNameInput(),
+              const NetWorthInput(),
               const _VatAmount(),
               const _GrossInput(),
             ],
@@ -153,38 +153,22 @@ class _SaveButtonState extends State<_SaveButton> {
   }
 }
 
-class _InvoiceNumberInput extends StatefulWidget {
-  const _InvoiceNumberInput({Key? key}) : super(key: key);
+class InvoiceNumberInput extends StatefulWidget {
+  const InvoiceNumberInput({Key? key}) : super(key: key);
 
   @override
-  State<_InvoiceNumberInput> createState() => _InvoiceNumberInputState();
+  State<InvoiceNumberInput> createState() => _InvoiceNumberInputState();
 }
 
-class _InvoiceNumberInputState extends State<_InvoiceNumberInput> {
-  late TextEditingController textEditingController;
-
-  @override
-  void initState() {
-    super.initState();
-    textEditingController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    textEditingController.dispose();
-    super.dispose();
-  }
-
+class _InvoiceNumberInputState extends State<InvoiceNumberInput> {
   @override
   Widget build(BuildContext context) {
     final invoiceNumberStatus = context.watch<FormModel>().invoiceNumber;
-    final formStatus = context.watch<FormModel>().status;
+    final formzState = context.watch<FormModel>();
+
     return TextField(
-      controller: formStatus.isSubmissionSuccess
-          ? textEditingController
-          : TextEditingController(
-              text: invoiceNumberStatus.value,
-            ),
+      // controller: textEditingController,
+      controller: formzState.invoiceController,
       onChanged: (input) {
         context.read<FormModel>().setInvoiceNumber(input);
       },
@@ -196,38 +180,21 @@ class _InvoiceNumberInputState extends State<_InvoiceNumberInput> {
   }
 }
 
-class _ContractorNameInput extends StatefulWidget {
-  const _ContractorNameInput({Key? key}) : super(key: key);
+class ContractorNameInput extends StatefulWidget {
+  const ContractorNameInput({Key? key}) : super(key: key);
 
   @override
-  State<_ContractorNameInput> createState() => _ContractorNameInputState();
+  State<ContractorNameInput> createState() => _ContractorNameInputState();
 }
 
-class _ContractorNameInputState extends State<_ContractorNameInput> {
-  late TextEditingController textEditingController;
-
-  @override
-  void initState() {
-    super.initState();
-    textEditingController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    textEditingController.dispose();
-    super.dispose();
-  }
-
+class _ContractorNameInputState extends State<ContractorNameInput> {
   @override
   Widget build(BuildContext context) {
     final contractorNameStatus = context.watch<FormModel>().contractorName;
-    final formStatus = context.watch<FormModel>().status;
+    final formzState = context.watch<FormModel>();
+
     return TextField(
-      controller: formStatus.isSubmissionSuccess
-          ? textEditingController
-          : TextEditingController(
-              text: contractorNameStatus.value,
-            ),
+      controller: formzState.contractorNameController,
       onChanged: (input) {
         context.read<FormModel>().setContractorName(input);
       },
@@ -240,38 +207,23 @@ class _ContractorNameInputState extends State<_ContractorNameInput> {
   }
 }
 
-class _NetWorthInput extends StatefulWidget {
-  const _NetWorthInput({Key? key}) : super(key: key);
+class NetWorthInput extends StatefulWidget {
+  const NetWorthInput({Key? key}) : super(key: key);
 
   @override
-  State<_NetWorthInput> createState() => _NetWorthInputState();
+  State<NetWorthInput> createState() => _NetWorthInputState();
 }
 
-class _NetWorthInputState extends State<_NetWorthInput> {
-  late TextEditingController textEditingController;
-
-  @override
-  void initState() {
-    super.initState();
-    textEditingController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    textEditingController.dispose();
-    super.dispose();
-  }
-
+class _NetWorthInputState extends State<NetWorthInput> {
   @override
   Widget build(BuildContext context) {
     final netWorthStatus = context.watch<FormModel>().netWorth;
-    final formStatus = context.watch<FormModel>().status;
     final vatAmount = context.watch<VatAmountState>().value;
+    final formState = context.watch<FormModel>();
 
     return TextField(
-      controller: formStatus.isSubmissionSuccess
-          ? TextEditingController()
-          : textEditingController,
+      keyboardType: TextInputType.number,
+      controller: formState.netWorthController,
       onChanged: (input) {
         context.read<FormModel>().setNetWorth(input);
         context.read<FormModel>().setGross(input, vatAmount);
@@ -297,6 +249,8 @@ class _VatAmountState extends State<_VatAmount> {
   int dropdownValue = vatAmounts.first;
   @override
   Widget build(BuildContext context) {
+    final formState = context.watch<FormModel>();
+
     return Row(
       children: [
         const Text('Podatek vat:'),
@@ -344,8 +298,9 @@ class _GrossInputState extends State<_GrossInput> {
 
   @override
   void initState() {
+    final provider = context.read<FormModel>();
     super.initState();
-    textEditingController = TextEditingController();
+    textEditingController = TextEditingController(text: provider.gross.value);
   }
 
   @override
@@ -359,18 +314,15 @@ class _GrossInputState extends State<_GrossInput> {
     final formState = context.watch<FormModel>();
     final netWorthStatus = formState.netWorth;
     final vatAmount = context.watch<VatAmountState>().value;
-    final formStatus = formState.status;
     final grossStatus = formState.gross;
 
     final gross = netWorthStatus.value != ''
-        ? int.parse(netWorthStatus.value) * (1 + vatAmount)
+        ? int.parse(netWorthStatus.value) * (1 + vatAmount * 0.01)
         : '';
     textEditingController.text = '$gross';
 
     return TextField(
-      controller: formStatus.isSubmissionSuccess
-          ? TextEditingController()
-          : textEditingController,
+      controller: textEditingController,
       onChanged: (input) {
         formState.setGross(input, vatAmount);
       },
